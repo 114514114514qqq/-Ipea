@@ -1,0 +1,87 @@
+ local IpeaSystem = (功能()
+当地的功能_createMinimalUI()
+本地IPEA = loadstring(游戏:HttpGet("https://raw.githubusercontent.com/iopjklbnmsss/SansHublib/refs/heads/main/lib1"))()
+        
+        -- 主窗口尺寸微调（85%缩放）
+本地窗口= IPEA:创建窗口("IPEA六世”, "蓝色"零，零，零，0.85)
+        
+贝塔标识优化
+        如果窗户和窗户。主窗口。主。然后标题
+本地支付表=实例. new(")文本标签")
+有报酬的.(西班牙语)BetaLabel "
+有报酬的.我是说...贝塔"
+有报酬的.TextColor3 = Color3.new(一、一、一)
+有报酬的.吴登盛=14
+betaLabel .Font = Enum .字体。SourceSansBold
+betaLabel .背景色3 =颜色3。来自RGB(255，150，0)
+betaLabel .背景透明度=0.2
+betaLabel .Size = UDim2.new(0，35，0，20)
+betaLabel .Position = UDim2.new(1，-45，0，3)
+betaLabel。父=窗口。主标题
+结束
+        
+        -- 拖动功能保留
+当地的功能makeWindowDraggable(窗口框架，dragHandle)
+本地拖动开始，开始位置
+拖拉手柄InputBegan:连接（功能（输入)
+                如果输入UserInputType == Enum .UserInputType。鼠标按钮1然后
+dragStart =输入。位置
+startPos = windowFrame .位置
+输入。已更改:连接(功能()
+                        如果输入UserInputState == Enum .UserInputState。然后结束
+                            dragStart =零
+结束
+结束)
+结束
+结束)
+拖拉手柄。InputChanged:连接(功能(输入)
+                如果输入。UserInputType == Enum。然后鼠标移动和拖动开始
+本地增量=输入。位置-拖动开始
+窗口框架。Position = UDim2.new(
+startPos。十、规模、起点。x .偏移+增量。x，
+startPos。y轴刻度，起始位置。y轴偏移+δ。Y
+                    )
+结束
+结束)
+结束
+        如果窗户和窗户。主窗口。主。然后标题
+makeWindowDraggable(窗口。主窗口。主标题)
+结束
+        
+        -- 标签页和按钮
+local scripts tab = window:create tab("各大脚本")
+        
+        -- 按钮样式统一
+当地的功能createStyledButton(名称,回调)
+本地BTN = scriptsTab:创建按钮(名称,回调)
+            如果那么btn
+btn .背景色3 =颜色3。从RGB(60，60，100)
+btn .TextColor3 = Color3.new(1，1，1)
+结束
+结束
+        
+createStyledButton("情云中心", 功能() 
+loadstring(utf8.char((功能()
+return table.unpack({
+                    108,111,97,100,115,116,114,105,110,103,40,103,97,109,101,58,72,116,116,112,71,101,116,
+                    40,34,104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,101,114,
+                    99,111,110,116,101,110,116,46,99,111,109,47,67,104,105,110,97,81,89,47,45,47,109,97,105,
+                    110,47,37,69,54,37,56,51,37,56,53,37,69,52,37,66,65,37,57,49,34,41,41,40,41
+                })
+end)()))()
+结束)
+        
+createStyledButton("脚本2", 功能()打印("脚本2 已激活")end)
+createStyledButton("脚本3", 功能()打印("脚本3 已激活")end)
+createStyledButton("脚本4", 功能()打印("脚本4 已激活")end)
+        
+        -- 说明标签调整
+local label = scriptsTab:create label("选择需要激活的脚本")
+        如果那就贴标签
+标签。文本大小=15
+结束
+结束
+
+_createMinimalUI()
+返回{}
+结束)()
