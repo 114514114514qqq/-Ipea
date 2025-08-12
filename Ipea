@@ -1,161 +1,411 @@
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+-- ======================
+-- ipeaV1卡密系统 (修复版)
+-- ======================
 
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "KeySystemGui"
-screenGui.ResetOnSpawn = false
-
-local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 400, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-mainFrame.BackgroundTransparency = 0.1
-mainFrame.BorderSizePixel = 0
-
-local corner = Instance.new("UICorner", mainFrame)
-corner.CornerRadius = UDim.new(0, 12)
-
-local stroke = Instance.new("UIStroke", mainFrame)
-stroke.Color = Color3.new(0.3, 0.3, 0.5)
-stroke.Thickness = 2
-
-local title = Instance.new("TextLabel", mainFrame)
-title.Text = " IPEA - 卡密验证"
-title.Size = UDim2.new(1, 0, 0, 50)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.3)
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 24
-
-local inputBox = Instance.new("TextBox", mainFrame)
-inputBox.PlaceholderText = "请输入卡密"
-inputBox.Size = UDim2.new(0.8, 0, 0, 40)
-inputBox.Position = UDim2.new(0.1, 0, 0.3, 0)
-inputBox.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-inputBox.TextColor3 = Color3.new(1, 1, 1)
-inputBox.Font = Enum.Font.SourceSans
-inputBox.TextSize = 18
-inputBox.ClearTextOnFocus = false
-
-local verifyButton = Instance.new("TextButton", mainFrame)
-verifyButton.Text = "验证卡密"
-verifyButton.Size = UDim2.new(0.6, 0, 0, 40)
-verifyButton.Position = UDim2.new(0.2, 0, 0.6, 0)
-verifyButton.BackgroundColor3 = Color3.new(0.1, 0.3, 0.6)
-verifyButton.TextColor3 = Color3.new(1, 1, 1)
-verifyButton.Font = Enum.Font.SourceSansBold
-verifyButton.TextSize = 18
-
-local buttonCorner = Instance.new("UICorner", verifyButton)
-buttonCorner.CornerRadius = UDim.new(0, 8)
-
-local buttonStroke = Instance.new("UIStroke", verifyButton)
-buttonStroke.Color = Color3.new(0.4, 0.6, 1)
-buttonStroke.Thickness = 2
-
-local errorLabel = Instance.new("TextLabel", mainFrame)
-errorLabel.Text = ""
-errorLabel.Size = UDim2.new(1, 0, 0, 20)
-errorLabel.Position = UDim2.new(0, 0, 0.9, 0)
-errorLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
-errorLabel.Font = Enum.Font.SourceSans
-errorLabel.TextSize = 16
-errorLabel.Visible = false
-
-local copyright = Instance.new("TextLabel", mainFrame)
-copyright.Text = "© 2023  Ipea - 版权所有"
-copyright.Size = UDim2.new(1, 0, 0, 20)
-copyright.Position = UDim2.new(0, 0, 1.05, 0)
-copyright.TextColor3 = Color3.new(0.7, 0.7, 0.7)
-copyright.Font = Enum.Font.SourceSans
-copyright.TextSize = 14
-
-local function validateKey()
-    local key = inputBox.Text
-    key = key:gsub("^%s*(.-)%s*$", "%1")
-    
-    if key == "" then
-        return "empty"
-    elseif key == "sknb666" then
-        return true
-    else
-        return false
-    end
+-- 确保在正确的执行上下文中运行
+if not game:IsLoaded() then
+    game.Loaded:Wait()
 end
 
-verifyButton.MouseButton1Click:Connect(function()
-    local result = validateKey()
-    
-    if result == true then
-        screenGui:Destroy()
-        
-        local msg = Instance.new("Message", workspace)
-        msg.Text = "欢迎使用司空脚本"
-        wait(1.8)
-        msg:Destroy()
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
 
-        msg = Instance.new("Message", workspace)
-        msg.Text = "这是Ipea研发的新脚本"
-        wait(1.8)
-        msg:Destroy()
+-- 创建圆角函数
+local function createRoundCorner(parent, radius)
+    local corner = Instance.new("UICorner")
+    corner.Parent = parent
+    corner.CornerRadius = UDim.new(radius, 0)
+    return corner
+end
 
-        msg = Instance.new("Message", workspace)
-        msg.Text = "加载中……"
-        wait(1.8)
-        msg:Destroy()
+-- 卡密验证系统
+local authGui = Instance.new("ScreenGui")
+authGui.Name = "AuthSystem"
+timeLabel.Font = Enum.Font.GothamBold
+timeLabel.Text = "加载中..."
+timeLabel.TextColor3 = Color3.new(0, 1, 1)
+timeLabel.TextSize = 14
 
-        local sound1 = Instance.new("Sound")
-        sound1.SoundId = "rbxassetid://4760592831"
-        sound1.Volume = 1
-        sound1.Looped = true
-        sound1.Parent = workspace
-        sound1:Play()
+local authFrame = Instance.new("Frame")
+authFrame.Name = "AuthFrame"
+local function updateTime()
+    timeLabel.Text = string.format("%s:%s:%s", 
+        os.date("%H"), os.date("%M"), os.date("%S"))
+end
+authFrame.BorderSizePixel = 4  -- 加粗边框
+authFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+spawn(function()
+    while true do
+        updateTime()
 
-        local sound2 = Instance.new("Sound")
-        sound2.SoundId = "rbxassetid://140242130183594"
-        sound2.Volume = 1
-        sound2.Looped = true
-        sound2.Parent = workspace
-        sound2:Play()
+    end
+end)
+titleLabel.Parent = authFrame
+-- 主功能UI系统
+local function createMainUI()
+    local mainGui = Instance.new("ScreenGui")
+    mainGui.Name = "ipeaMobileUI"
+    mainGui.Parent = CoreGui
+    mainGui.ResetOnSpawn = false
+    mainGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-        local sound3 = Instance.new("Sound")
-        sound3.SoundId = "rbxassetid://97846194346269"
-        sound3.Volume = 1
-        sound3.Looped = true
-        sound3.Parent = workspace
-        sound3:Play()
+local titleLine = Instance.new("Frame")
+titleLine.Name = "TitleLine"
+titleLine.Parent = titleLabel
+titleLine.BackgroundColor3 = Color3.new(0, 1, 1)
+titleLine.BorderSizePixel = 0
+titleLine.Position = UDim2.new(0.15, 0, 0.9, 0)
+titleLine.Size = UDim2.new(0.7, 0, 0, 2)
 
-        local sound4 = Instance.new("Sound")
-        sound4.SoundId = "rbxassetid://106786416076383"
-        sound4.Volume = 1
-        sound4.Looped = true
-        sound4.Parent = workspace
-        sound4:Play()
+local keyBox = Instance.new("TextBox")
+keyBox.Name = "KeyBox"
+keyBox.Parent = authFrame
+keyBox.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+keyBox.BackgroundTransparency = 0.8
+keyBox.BorderColor3 = Color3.new(0, 1, 1)
+keyBox.BorderSizePixel = 2
+keyBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+keyBox.Size = UDim2.new(0.8, 0, 0, 35)
+keyBox.Font = Enum.Font.Gotham
+keyBox.PlaceholderText = "输入卡密"
+keyBox.Text = ""
+keyBox.TextColor3 = Color3.new(1, 1, 1)
+keyBox.TextSize = 16
+createRoundCorner(keyBox, 0.2) -- 添加圆角
 
-        msg = Instance.new("Message", workspace)
-        msg.Text = "你他妈配吗😡"
-        wait(1)
-        msg:Destroy()
+local authButton = Instance.new("TextButton")
+authButton.Name = "AuthButton"
+authButton.Parent = authFrame
+authButton.BackgroundColor3 = Color3.new(0, 0.4, 0.4)
+authButton.BackgroundTransparency = 0.8
+authButton.BorderColor3 = Color3.new(0, 1, 1)
+authButton.BorderSizePixel = 2
+authButton.Position = UDim2.new(0.25, 0, 0.6, 0)
+authButton.Size = UDim2.new(0.5, 0, 0, 30)
+authButton.Font = Enum.Font.GothamBold
+authButton.Text = "验 证"
+authButton.TextColor3 = Color3.new(1, 1, 1)
+authButton.TextSize = 16
+createRoundCorner(authButton, 0.3) -- 添加圆角
 
-        while true do end
-        
-    elseif result == "empty" then
-        errorLabel.Text = "你不输入进你M！"
-        errorLabel.Visible = true
-        
-        delay(3, function()
-            errorLabel.Visible = false
-        end)
-    else
-        errorLabel.Text = "卡密错误！"
-        errorLabel.Visible = true
-        
-        delay(3, function()
-            errorLabel.Visible = false
-        end)
+-- 北京时间显示系统
+local timeGui = Instance.new("ScreenGui")
+timeGui.Name = "TimeSystem"
+timeGui.Parent = CoreGui
+timeGui.ResetOnSpawn = false
+timeGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+timeGui.Enabled = true
+
+local timeLabel = Instance.new("TextLabel")
+timeLabel.Name = "TimeLabel"
+timeLabel.Parent = timeGui
+timeLabel.BackgroundTransparency = 1
+timeLabel.Position = UDim2.new(0.02, 0, 0.02, 0)
+timeLabel.Size = UDim2.new(0, 150, 0, 25)
+timeLabel.Font = Enum.Font.GothamBold
+timeLabel.Text = "加载中..."
+timeLabel.TextColor3 = Color3.new(0, 1, 1)
+timeLabel.TextSize = 14
+timeLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- 更新时间函数
+local function updateTime()
+    timeLabel.Text = string.format("%s:%s:%s", 
+        os.date("%H"), os.date("%M"), os.date("%S"))
+end
+
+-- 启动时间更新协程
+spawn(function()
+    while true do
+        updateTime()
+        wait(0.5)
     end
 end)
 
-inputBox.FocusLost:Connect(function(enterPressed)
-    if enterPressed the
+-- 主功能UI系统
+local function createMainUI()
+    local mainGui = Instance.new("ScreenGui")
+    mainGui.Name = "ipeaMobileUI"
+    mainGui.Parent = CoreGui
+    mainGui.ResetOnSpawn = false
+    mainGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    mainGui.Enabled = true
+    
+    -- 主窗口框架 - 改为更小的正方形
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "MainFrame"
+    mainFrame.Parent = mainGui
+    mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.15)
+    mainFrame.BackgroundTransparency = 0.5  -- 调整为半透明 (0.5)
+    mainFrame.BorderColor3 = Color3.new(0, 1, 1)
+    mainFrame.BorderSizePixel = 4  -- 加粗边框
+    mainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)  -- 居中显示
+    mainFrame.Size = UDim2.new(0, 300, 0, 300)  -- 更小的正方形
+    createRoundCorner(mainFrame, 0.05) -- 添加圆角
+    
+    -- 标题栏
+    local titleBar = Instance.new("Frame")
+    titleBar.Name = "TitleBar"
+    titleBar.Parent = mainFrame
+    titleBar.BackgroundColor3 = Color3.new(0.15, 0.15, 0.2)
+    titleBar.BackgroundTransparency = 0.9
+    titleBar.BorderSizePixel = 0
+    titleBar.Size = UDim2.new(1, 0, 0.06, 0)
+    createRoundCorner(titleBar, 0) -- 顶部圆角
+    
+    local titleText = Instance.new("TextLabel")
+    titleText.Name = "TitleText"
+    titleText.Parent = titleBar
+    titleText.BackgroundTransparency = 1
+    titleText.Size = UDim2.new(0.7, 0, 1, 0)
+    titleText.Font = Enum.Font.GothamBold
+    titleText.Text = "ipea脚本中心"  -- 修改标题
+    titleText.TextColor3 = Color3.new(0, 1, 1)
+    titleText.TextSize = 16
+    
+    local closeButton = Instance.new("TextButton")
+    closeButton.Name = "CloseButton"
+    closeButton.Parent = titleBar
+    closeButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
+    closeButton.BackgroundTransparency = 0.8
+    closeButton.BorderColor3 = Color3.new(1, 0, 0)
+    closeButton.BorderSizePixel = 2
+    closeButton.Position = UDim2.new(0.85, 0, 0.1, 0)  -- 向左移动一小点（从0.9改为0.85）
+    closeButton.Size = UDim2.new(0.1, 0, 0.8, 0)
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.new(1, 1, 1)
+    closeButton.TextSize = 14
+    
+    -- 修改这里：将圆角半径设为0.5使其完全圆形
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.Parent = closeButton
+    closeCorner.CornerRadius = UDim.new(0.5, 0) -- 设置为0.5使其完全圆形
+    
+    closeButton.MouseButton1Click:Connect(function()
+        mainGui.Enabled = not mainGui.Enabled
+    end)
+    
+    -- 使整个窗口可拖动（通过标题栏）
+    local dragging
+    local dragInput
+    local dragStart
+    local startPos
+    
+    local function update(input)
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    
+    titleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    
+    titleBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
+    
+    -- 标签栏
+    local tabBar = Instance.new("Frame")
+    tabBar.Name = "TabBar"
+    tabBar.Parent = mainFrame
+    tabBar.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+    tabBar.BackgroundTransparency = 0.9
+    tabBar.BorderSizePixel = 0
+    tabBar.Position = UDim2.new(0, 0, 0.06, 0)
+    tabBar.Size = UDim2.new(1, 0, 0.07, 0)
+    
+    -- 标签按钮 - 移除了"高级功能"标签
+    local tabs = {
+        {name = "常用功能", id = "main"},
+        {name = "功能分类栏", id = "player"}
+    }
+    
+    local tabButtons = {}
+    local tabContents = {}
+    
+    for i, tab in ipairs(tabs) do
+        -- 创建标签按钮
+        local tabButton = Instance.new("TextButton")
+        tabButton.Name = tab.name.."Tab"
+        tabButton.Parent = tabBar
+        tabButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.3)
+        tabButton.BackgroundTransparency = 0.8
+        tabButton.BorderColor3 = Color3.new(0, 1, 1)
+        tabButton.BorderSizePixel = 2
+        tabButton.Position = UDim2.new(0.5 * (i-1), 0, 0, 0)
+        tabButton.Size = UDim2.new(0.5, 0, 1, 0)
+        tabButton.Font = Enum.Font.Gotham
+        tabButton.Text = tab.name
+        tabButton.TextColor3 = Color3.new(0.8, 0.8, 1)
+        tabButton.TextSize = 14
+        createRoundCorner(tabButton, 0.2) -- 添加圆角
+        
+        -- 创建标签内容
+        local tabContent = Instance.new("Frame")
+        tabContent.Name = tab.name.."Content"
+        tabContent.Parent = mainFrame
+        tabContent.BackgroundTransparency = 1
+        tabContent.Position = UDim2.new(0, 0, 0.13, 0)
+        tabContent.Size = UDim2.new(1, 0, 0.87, 0)
+        tabContent.Visible = (i == 1)
+        
+        -- 按钮点击事件
+        tabButton.MouseButton1Click:Connect(function()
+            for _, content in ipairs(tabContents) do
+                content.Visible = false
+            end
+            for _, button in ipairs(tabButtons) do
+                button.BackgroundColor3 = Color3.new(0.2, 0.2, 0.3)
+            end
+            tabContent.Visible = true
+            tabButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.5)
+        end)
+        
+        table.insert(tabButtons, tabButton)
+        table.insert(tabContents, tabContent)
+    end
+    
+    -- ===== 常用功能标签内容 =====
+    local mainTab = tabContents[1]
+    
+    -- 添加滑动功能
+    local scrollFrame = Instance.new("ScrollingFrame")
+    scrollFrame.Name = "ScrollFrame"
+    scrollFrame.Parent = mainTab
+    scrollFrame.BackgroundTransparency = 1
+    scrollFrame.Size = UDim2.new(1, 0, 1, 0)
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 1.5, 0)  -- 可滚动区域
+    scrollFrame.ScrollBarThickness = 5
+    
+    -- 功能按钮容器
+    local buttonContainer = Instance.new("Frame")
+    buttonContainer.Name = "ButtonContainer"
+    buttonContainer.Parent = scrollFrame
+    buttonContainer.BackgroundTransparency = 1
+    buttonContainer.Size = UDim2.new(1, 0, 1, 0)
+    
+    local uigLayout = Instance.new("UIGridLayout")
+    uigLayout.Parent = buttonContainer
+    uigLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    uigLayout.CellPadding = UDim2.new(0.02, 0, 0.02, 0)
+    uigLayout.CellSize = UDim2.new(0.48, 0, 0.15, 0)  -- 缩小按钮高度 (0.2 -> 0.15)
+    uigLayout.FillDirection = Enum.FillDirection.Horizontal
+    uigLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    uigLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    uigLayout.StartCorner = Enum.StartCorner.TopLeft
+    
+    -- 添加功能按钮（移除了飞行、穿墙和无限跳跃）
+    for i = 1, 8 do
+        local extraButton = Instance.new("TextButton")
+        extraButton.Name = "ExtraButton"..i
+        extraButton.Parent = buttonContainer
+        extraButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.5)
+        extraButton.BackgroundTransparency = 0.8
+        extraButton.BorderColor3 = Color3.new(0, 1, 1)
+        extraButton.BorderSizePixel = 2
+        extraButton.Font = Enum.Font.GothamBold
+        extraButton.Text = "功能 "..i
+        extraButton.TextColor3 = Color3.new(1, 1, 1)
+        extraButton.TextSize = 14
+        createRoundCorner(extraButton, 0.2) -- 添加圆角
+    end
+    
+    -- ===== 功能分类栏标签内容 =====
+    local playerTab = tabContents[2]
+    
+    -- 添加滑动功能
+    local categoryScrollFrame = Instance.new("ScrollingFrame")
+    categoryScrollFrame.Name = "CategoryScrollFrame"
+    categoryScrollFrame.Parent = playerTab
+    categoryScrollFrame.BackgroundTransparency = 1
+    categoryScrollFrame.Size = UDim2.new(1, 0, 1, 0)
+    categoryScrollFrame.CanvasSize = UDim2.new(0, 0, 0.84, 0)  -- 修改为0.84，因为7个按钮，每个0.12高度
+    categoryScrollFrame.ScrollBarThickness = 5
+
+    -- 功能分类容器
+    local categoryContainer = Instance.new("Frame")
+    categoryContainer.Name = "CategoryContainer"
+    categoryContainer.Parent = categoryScrollFrame
+    categoryContainer.BackgroundTransparency = 1
+    categoryContainer.Size = UDim2.new(1, 0, 0.84, 0)   -- 修改：高度0.84
+
+    -- 添加7个功能分类按钮（移除了8-12）
+    for i = 1, 7 do
+        local categoryButton = Instance.new("TextButton")
+        categoryButton.Name = "CategoryButton"..i
+        categoryButton.Parent = categoryContainer
+        categoryButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.5)  -- 统一为相同颜色
+        categoryButton.BackgroundTransparency = 0.8
+        categoryButton.BorderColor3 = Color3.new(0, 1, 1)
+        categoryButton.BorderSizePixel = 2
+        categoryButton.Font = Enum.Font.Gotham
+        categoryButton.Text = "功能分类 "..i
+        categoryButton.TextColor3 = Color3.new(0.8, 0.8, 1)
+        categoryButton.TextSize = 14
+        createRoundCorner(categoryButton, 0.2) -- 添加圆角
+
+        -- 设置位置和大小（向右偏移）
+        categoryButton.Position = UDim2.new(0.15, 0, 0.12*(i-1), 0)  -- 修改：X位置从0.15开始（向右偏移）
+        categoryButton.Size = UDim2.new(0.7, 0, 0.12, 0)            -- 修改：宽度为70%
+    end
+    
+    -- 玩家信息
+    local infoLabel = Instance.new("TextLabel")
+    infoLabel.Name = "InfoLabel"
+    infoLabel.Parent = playerTab
+    infoLabel.BackgroundTransparency = 1
+    infoLabel.Position = UDim2.new(0.05, 0, 0.85, 0)   -- 位置在85%处
+    infoLabel.Size = UDim2.new(0.9, 0, 0.15, 0)        -- 高度15%
+    infoLabel.Font = Enum.Font.Gotham
+    infoLabel.Text = "玩家: "..Players.LocalPlayer.Name.." nID: "..game.PlaceId
+    infoLabel.TextColor3 = Color3.new(0.8, 0.8, 1)
+    infoLabel.TextSize = 12
+    infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+    infoLabel.TextYAlignment = Enum.TextYAlignment.Top
+    
+    return mainGui
+end
+
+-- 卡密验证回调
+authButton.MouseButton1Click:Connect(function()
+    if keyBox.Text == "ipeaV1" then
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+        -- 添加打开/关闭快捷键
+        UserInputService.InputBegan:Connect(function(input, processed)
+            if not processed and input.KeyCode == Enum.KeyCode.F then
+local UserInputService = game:GetService("UserInputService")
+            end
+        end)
+local function createRoundCorner(parent, radius)
+    local corner = Instance.new("UICorner")
+    corner.Parent = parent
+end)
+
+end
+authGui.Enabled = true
+timeGui.Enabled = true
+
+authGui.Name = "AuthSystem"
+print("ipeaV1卡密系统已加载   等待验证...")
