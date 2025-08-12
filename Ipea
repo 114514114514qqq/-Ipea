@@ -1,87 +1,161 @@
- local IpeaSystem = (功能()
-当地的功能_createMinimalUI()
-本地IPEA = loadstring(游戏:HttpGet("https://raw.githubusercontent.com/iopjklbnmsss/SansHublib/refs/heads/main/lib1"))()
-        
-        -- 主窗口尺寸微调（85%缩放）
-本地窗口= IPEA:创建窗口("IPEA六世”, "蓝色"零，零，零，0.85)
-        
-贝塔标识优化
-        如果窗户和窗户。主窗口。主。然后标题
-本地支付表=实例. new(")文本标签")
-有报酬的.(西班牙语)BetaLabel "
-有报酬的.我是说...贝塔"
-有报酬的.TextColor3 = Color3.new(一、一、一)
-有报酬的.吴登盛=14
-betaLabel .Font = Enum .字体。SourceSansBold
-betaLabel .背景色3 =颜色3。来自RGB(255，150，0)
-betaLabel .背景透明度=0.2
-betaLabel .Size = UDim2.new(0，35，0，20)
-betaLabel .Position = UDim2.new(1，-45，0，3)
-betaLabel。父=窗口。主标题
-结束
-        
-        -- 拖动功能保留
-当地的功能makeWindowDraggable(窗口框架，dragHandle)
-本地拖动开始，开始位置
-拖拉手柄InputBegan:连接（功能（输入)
-                如果输入UserInputType == Enum .UserInputType。鼠标按钮1然后
-dragStart =输入。位置
-startPos = windowFrame .位置
-输入。已更改:连接(功能()
-                        如果输入UserInputState == Enum .UserInputState。然后结束
-                            dragStart =零
-结束
-结束)
-结束
-结束)
-拖拉手柄。InputChanged:连接(功能(输入)
-                如果输入。UserInputType == Enum。然后鼠标移动和拖动开始
-本地增量=输入。位置-拖动开始
-窗口框架。Position = UDim2.new(
-startPos。十、规模、起点。x .偏移+增量。x，
-startPos。y轴刻度，起始位置。y轴偏移+δ。Y
-                    )
-结束
-结束)
-结束
-        如果窗户和窗户。主窗口。主。然后标题
-makeWindowDraggable(窗口。主窗口。主标题)
-结束
-        
-        -- 标签页和按钮
-local scripts tab = window:create tab("各大脚本")
-        
-        -- 按钮样式统一
-当地的功能createStyledButton(名称,回调)
-本地BTN = scriptsTab:创建按钮(名称,回调)
-            如果那么btn
-btn .背景色3 =颜色3。从RGB(60，60，100)
-btn .TextColor3 = Color3.new(1，1，1)
-结束
-结束
-        
-createStyledButton("情云中心", 功能() 
-loadstring(utf8.char((功能()
-return table.unpack({
-                    108,111,97,100,115,116,114,105,110,103,40,103,97,109,101,58,72,116,116,112,71,101,116,
-                    40,34,104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,101,114,
-                    99,111,110,116,101,110,116,46,99,111,109,47,67,104,105,110,97,81,89,47,45,47,109,97,105,
-                    110,47,37,69,54,37,56,51,37,56,53,37,69,52,37,66,65,37,57,49,34,41,41,40,41
-                })
-end)()))()
-结束)
-        
-createStyledButton("脚本2", 功能()打印("脚本2 已激活")end)
-createStyledButton("脚本3", 功能()打印("脚本3 已激活")end)
-createStyledButton("脚本4", 功能()打印("脚本4 已激活")end)
-        
-        -- 说明标签调整
-local label = scriptsTab:create label("选择需要激活的脚本")
-        如果那就贴标签
-标签。文本大小=15
-结束
-结束
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
-_createMinimalUI()
-返回{}
-结束)()
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "KeySystemGui"
+screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 400, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+mainFrame.BackgroundTransparency = 0.1
+mainFrame.BorderSizePixel = 0
+
+local corner = Instance.new("UICorner", mainFrame)
+corner.CornerRadius = UDim.new(0, 12)
+
+local stroke = Instance.new("UIStroke", mainFrame)
+stroke.Color = Color3.new(0.3, 0.3, 0.5)
+stroke.Thickness = 2
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Text = " IPEA - 卡密验证"
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.3)
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 24
+
+local inputBox = Instance.new("TextBox", mainFrame)
+inputBox.PlaceholderText = "请输入卡密"
+inputBox.Size = UDim2.new(0.8, 0, 0, 40)
+inputBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+inputBox.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+inputBox.TextColor3 = Color3.new(1, 1, 1)
+inputBox.Font = Enum.Font.SourceSans
+inputBox.TextSize = 18
+inputBox.ClearTextOnFocus = false
+
+local verifyButton = Instance.new("TextButton", mainFrame)
+verifyButton.Text = "验证卡密"
+verifyButton.Size = UDim2.new(0.6, 0, 0, 40)
+verifyButton.Position = UDim2.new(0.2, 0, 0.6, 0)
+verifyButton.BackgroundColor3 = Color3.new(0.1, 0.3, 0.6)
+verifyButton.TextColor3 = Color3.new(1, 1, 1)
+verifyButton.Font = Enum.Font.SourceSansBold
+verifyButton.TextSize = 18
+
+local buttonCorner = Instance.new("UICorner", verifyButton)
+buttonCorner.CornerRadius = UDim.new(0, 8)
+
+local buttonStroke = Instance.new("UIStroke", verifyButton)
+buttonStroke.Color = Color3.new(0.4, 0.6, 1)
+buttonStroke.Thickness = 2
+
+local errorLabel = Instance.new("TextLabel", mainFrame)
+errorLabel.Text = ""
+errorLabel.Size = UDim2.new(1, 0, 0, 20)
+errorLabel.Position = UDim2.new(0, 0, 0.9, 0)
+errorLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
+errorLabel.Font = Enum.Font.SourceSans
+errorLabel.TextSize = 16
+errorLabel.Visible = false
+
+local copyright = Instance.new("TextLabel", mainFrame)
+copyright.Text = "© 2023  Ipea - 版权所有"
+copyright.Size = UDim2.new(1, 0, 0, 20)
+copyright.Position = UDim2.new(0, 0, 1.05, 0)
+copyright.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+copyright.Font = Enum.Font.SourceSans
+copyright.TextSize = 14
+
+local function validateKey()
+    local key = inputBox.Text
+    key = key:gsub("^%s*(.-)%s*$", "%1")
+    
+    if key == "" then
+        return "empty"
+    elseif key == "sknb666" then
+        return true
+    else
+        return false
+    end
+end
+
+verifyButton.MouseButton1Click:Connect(function()
+    local result = validateKey()
+    
+    if result == true then
+        screenGui:Destroy()
+        
+        local msg = Instance.new("Message", workspace)
+        msg.Text = "欢迎使用司空脚本"
+        wait(1.8)
+        msg:Destroy()
+
+        msg = Instance.new("Message", workspace)
+        msg.Text = "这是Ipea研发的新脚本"
+        wait(1.8)
+        msg:Destroy()
+
+        msg = Instance.new("Message", workspace)
+        msg.Text = "加载中……"
+        wait(1.8)
+        msg:Destroy()
+
+        local sound1 = Instance.new("Sound")
+        sound1.SoundId = "rbxassetid://4760592831"
+        sound1.Volume = 1
+        sound1.Looped = true
+        sound1.Parent = workspace
+        sound1:Play()
+
+        local sound2 = Instance.new("Sound")
+        sound2.SoundId = "rbxassetid://140242130183594"
+        sound2.Volume = 1
+        sound2.Looped = true
+        sound2.Parent = workspace
+        sound2:Play()
+
+        local sound3 = Instance.new("Sound")
+        sound3.SoundId = "rbxassetid://97846194346269"
+        sound3.Volume = 1
+        sound3.Looped = true
+        sound3.Parent = workspace
+        sound3:Play()
+
+        local sound4 = Instance.new("Sound")
+        sound4.SoundId = "rbxassetid://106786416076383"
+        sound4.Volume = 1
+        sound4.Looped = true
+        sound4.Parent = workspace
+        sound4:Play()
+
+        msg = Instance.new("Message", workspace)
+        msg.Text = "你他妈配吗😡"
+        wait(1)
+        msg:Destroy()
+
+        while true do end
+        
+    elseif result == "empty" then
+        errorLabel.Text = "你不输入进你M！"
+        errorLabel.Visible = true
+        
+        delay(3, function()
+            errorLabel.Visible = false
+        end)
+    else
+        errorLabel.Text = "卡密错误！"
+        errorLabel.Visible = true
+        
+        delay(3, function()
+            errorLabel.Visible = false
+        end)
+    end
+end)
+
+inputBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed the
